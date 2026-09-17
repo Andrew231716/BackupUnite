@@ -1,0 +1,16 @@
+{
+  "name": "Backup Unite",
+  "short_name": "Backup Unite",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#140e1a",
+  "theme_color": "#140e1a",
+  "lang": "it",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}

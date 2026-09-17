@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <title>Backup Unite self-test</title>
+  <style>
+    body { font-family: sans-serif; background: #140e1a; color: #f4edff; padding: 24px; }
+    pre { white-space: pre-wrap; background: #251833; padding: 16px; border-radius: 12px; }
+  </style>
+</head>
+<body>
+  <h1>Self-test</h1>
+  <pre id="out">Avvio…</pre>
+  <script>
+    const out = document.getElementById("out");
+    const worker = new Worker("js/merge-worker.js");
+    function load(name) {
+      return fetch("fixtures/" + name).then(function (res) { return res.arrayBuffer(); }).then(function (buf) {
+        return { name: name, buffer: new Uint8Array(buf) };
+      });
+    }
+    worker.onmessage = function (event) {
+      const data = event.data || {};
+      if (!data.ok) {
+        out.textContent = "ERRORE: " + data.error;
+        return;
+      }
+      if (data.analysis) {
+        const resolutions = {};
+        data.analysis.conflicts.forEach(function (item) {
+          resolutions[item.id] = item.kind === "note" ? "both" : "right";
+        });
+        out.textContent = "Analisi ok, conflitti: " + data.analysis.conflicts.length + "\n" +
+          JSON.stringify(data.analysis.conflicts.map(function (c) { return c.kind + " " + c.id; }), null, 2);
+        worker.postMessage({
+          id: 2,
+          type: "merge",
+          left: window._left,
+          right: window._right,
+          resolutions: resolutions,
+          highlightMode: "both"
+        });
+        return;
+      }
+      if (data.summary) {
+        out.textContent = JSON.stringify({
+          status: "ok",
+          notes: data.summary.notes,
+          highlights: data.summary.highlights,
+          bookmarks: data.summary.bookmarks,
+          tags: data.summary.tags,
+          inputFields: data.summary.inputFields,
+          playlists: data.summary.playlists,
+          playlistItems: data.summary.playlistItems,
+          media: data.summary.media,
+          filename: data.summary.filename,
+          bytes: data.summary.bytes.byteLength,
+          bookmarkConflicts: data.summary.bookmarkConflicts,
+          markingConflicts: data.summary.markingConflicts,
+          noteConflicts: data.summary.noteConflicts,
+          inputFieldConflicts: data.summary.inputFieldConflicts
+        }, null, 2);
+      }
+    };
+    Promise.all([load("left.jwlibrary"), load("right.jwlibrary")]).then(function (files) {
+      window._left = files[0];
+      window._right = files[1];
+      worker.postMessage({ id: 1, type: "analyze", left: files[0], right: files[1], highlightMode: "both" });
+    }).catch(function (error) {
+      out.textContent = String(error);
+    });
+  </script>
+</body>
+</html>
