@@ -74,11 +74,23 @@ async function refreshSaved() {
   state.saved = await BackupUniteStorage.list();
 }
 
+function isJwLibraryName(name) {
+  return /\.jwlibrary$/i.test(name || "");
+}
+
 function selectedNames() {
-  if (!state.files.length) return '<div class="file-box">Nessun backup selezionato</div>';
+  if (!state.files.length) {
+    return '<div class="file-box">Nessun backup selezionato<br><span class="caption">Puoi sceglierli insieme oppure uno alla volta.</span></div>';
+  }
   return '<div class="file-box">' + state.files.map(function (file, index) {
     return '<div class="file-item"><strong>' + (index + 1) + '</strong><span>' + escapeHtml(file.name) + '</span><span class="ok">✓</span></div>';
   }).join("") + "</div>";
+}
+
+function pickButtonLabel() {
+  if (!state.files.length) return "Scegli i backup";
+  if (state.files.length === 1) return "Aggiungi il secondo backup";
+  return "Cambia selezione";
 }
 
 function primaryLabel() {
@@ -244,11 +256,12 @@ function render() {
     '<div class="stack">' +
       '<section class="card">' +
         "<h2>Nuovo merge</h2>" +
-        '<p class="muted">Scegli esattamente due file .jwlibrary. L’app non modifica mai gli originali e lavora solo nel browser.</p>' +
+        '<p class="muted">Scegli due file .jwlibrary. Su iPhone, se i file sembrano non selezionabili, apri «Sfoglia» e sceglili uno alla volta: il filtro del sistema non riconosce sempre l’estensione.</p>' +
         selectedNames() +
         '<button class="secondary full" data-action="pick" ' + (state.busy ? "disabled" : "") + ">" +
-          (state.files.length ? "Cambia selezione" : "Scegli due backup") +
+          pickButtonLabel() +
         "</button>" +
+        (state.files.length ? '<button class="secondary full" style="margin-top:8px" data-action="clear-files" ' + (state.busy ? "disabled" : "") + ">Rimuovi selezione</button>" : "") +
         '<div class="context" style="margin-top:12px">' +
           "<strong>Sottolineature da usare</strong>" +
           '<div class="segmented" style="margin:10px 0">' +
@@ -272,29 +285,40 @@ function render() {
 }
 
 function receiveFiles(fileList) {
-  const files = Array.from(fileList || []);
-  if (files.length !== 2) {
-    state.files = [];
-    state.error = "Seleziona esattamente due backup nello stesso passaggio.";
-    render();
-    return;
-  }
-  const invalid = files.find(function (file) {
-    return !file.name.toLowerCase().endsWith(".jwlibrary");
-  });
+  const incoming = Array.from(fileList || []);
+  if (!incoming.length) return;
+
+  const invalid = incoming.find(function (file) { return !isJwLibraryName(file.name); });
   if (invalid) {
-    state.files = [];
-    state.error = "Il file " + invalid.name + " non è un backup .jwlibrary.";
+    state.error = "Il file «" + invalid.name + "» non è un backup .jwlibrary. Seleziona solo file con quella estensione.";
     render();
     return;
   }
-  state.files = files;
+
+  let next = [];
+  if (incoming.length >= 2) {
+    next = incoming.slice(0, 2);
+  } else if (state.files.length === 1 && incoming.length === 1) {
+    next = [state.files[0], incoming[0]];
+  } else {
+    next = incoming.slice(0, 1);
+  }
+
+  state.files = next;
   state.analysis = null;
   state.resolutions = {};
   state.summary = null;
   state.error = "";
-  state.storageMessage = "";
+  state.storageMessage = next.length === 1
+    ? "Primo backup pronto. Tocca di nuovo per aggiungere il secondo."
+    : "";
   render();
+}
+
+function openFilePicker() {
+  const input = $("file-input");
+  input.value = "";
+  input.click();
 }
 
 async function buffersFromFiles() {
@@ -404,7 +428,17 @@ document.addEventListener("click", async function (event) {
   const button = event.target.closest("[data-action]");
   if (!button || button.disabled) return;
   const action = button.getAttribute("data-action");
-  if (action === "pick") $("file-input").click();
+  if (action === "pick") openFilePicker();
+  if (action === "clear-files") {
+    state.files = [];
+    state.analysis = null;
+    state.resolutions = {};
+    state.summary = null;
+    state.error = "";
+    state.storageMessage = "";
+    $("file-input").value = "";
+    render();
+  }
   if (action === "highlight") {
     state.highlightMode = button.getAttribute("data-mode");
     state.analysis = null;

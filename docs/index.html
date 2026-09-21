@@ -13,7 +13,11 @@
 </head>
 <body>
   <main class="app" id="app"></main>
-  <input id="file-input" class="hidden" type="file" accept=".jwlibrary,application/zip" multiple>
+  <!--
+    No accept filter: on iOS Safari, accept=".jwlibrary" greys out backups because
+    the OS does not map that extension to a known document type.
+  -->
+  <input id="file-input" class="hidden" type="file" multiple>
   <script src="js/storage.js"></script>
   <script src="js/app.js"></script>
 </body>
