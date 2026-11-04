@@ -25,6 +25,8 @@ Poi vai su [http://localhost:8080](http://localhost:8080). Scegli due file `.jwl
 
 La pubblicazione su GitHub Pages usa la cartella `docs/` e il workflow in `.github/workflows/pages.yml`.
 
+Versione online su Vercel: [https://backupunite.vercel.app](https://backupunite.vercel.app).
+
 ## App iOS
 
 Aprire `BackupUnite.xcodeproj`, selezionare il proprio iPhone e premere Run. Il progetto richiede iOS 17 o successivo e usa ZIPFoundation 0.9.20, CryptoKit e SQLite di sistema.

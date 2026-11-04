@@ -248,15 +248,7 @@ function bulkMenu(conflict) {
 }
 
 function brandMark() {
-  return (
-    '<div class="brand-mark" aria-hidden="true">' +
-      '<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-        '<rect x="6" y="12" width="14" height="24" rx="3" fill="currentColor" opacity="0.88"/>' +
-        '<rect x="28" y="12" width="14" height="24" rx="3" fill="currentColor" opacity="0.88"/>' +
-        '<path d="M16 22h16c1.2 0 2 1.1 1.6 2.2l-3.2 8.1A2 2 0 0 1 28.5 34h-9a2 2 0 0 1-1.9-1.7l-3.2-8.1C13.9 23.1 14.8 22 16 22Z" fill="#9fd8d3"/>' +
-      "</svg>" +
-    "</div>"
-  );
+  return '<div class="brand-mark" aria-hidden="true"><img src="icon.svg" alt="" width="48" height="48"></div>';
 }
 
 function render() {

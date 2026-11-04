@@ -80,19 +80,23 @@ body::before {
 }
 
 .brand-mark {
-  width: 72px;
-  height: 72px;
+  width: 84px;
+  height: 84px;
   margin: 0 auto 14px;
-  border-radius: 20px;
+  border-radius: 22px;
+  overflow: hidden;
   display: grid;
   place-items: center;
-  background: linear-gradient(145deg, #124f5d, #0f6e6a);
-  color: white;
   box-shadow: 0 12px 28px rgba(15, 110, 106, 0.28);
   animation: soft-float 4.8s ease-in-out infinite;
 }
 
-.brand-mark svg { width: 38px; height: 38px; }
+.brand-mark img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
 
 @keyframes soft-float {
   0%, 100% { transform: translateY(0); }
