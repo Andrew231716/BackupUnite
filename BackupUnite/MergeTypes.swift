@@ -48,16 +48,16 @@ enum HighlightMergeMode: String, CaseIterable, Codable, Hashable, Sendable {
     var title: String {
         switch self {
         case .both: "Entrambi"
-        case .leftOnly: "1° backup"
-        case .rightOnly: "2° backup"
+        case .leftOnly: "Solo 1°"
+        case .rightOnly: "Solo 2°"
         }
     }
 
     var explanation: String {
         switch self {
         case .both: "Unisce le sottolineature dei due backup e ti mostra le eventuali collisioni."
-        case .leftOnly: "Usa soltanto le sottolineature del primo backup selezionato."
-        case .rightOnly: "Usa soltanto le sottolineature del secondo backup selezionato."
+        case .leftOnly: "Mantiene soltanto le sottolineature del primo backup selezionato."
+        case .rightOnly: "Mantiene soltanto le sottolineature del secondo backup selezionato."
         }
     }
 

@@ -32,6 +32,7 @@ struct ContentView: View {
                 VStack(spacing: 18) {
                     header
                     mergeCard
+                    highlightCard
                     if let analysis, !analysis.conflicts.isEmpty { conflictSummaryCard(analysis) }
                     if let mergeSummary { resultCard(mergeSummary) }
                     savedBackupsCard
@@ -83,13 +84,13 @@ struct ContentView: View {
                 RoundedRectangle(cornerRadius: 22, style: .continuous)
                     .fill(
                         LinearGradient(
-                            colors: [Color(red: 0.07, green: 0.31, blue: 0.36), Color(red: 0.06, green: 0.43, blue: 0.42)],
+                            colors: [Color(red: 0.23, green: 0.54, blue: 0.94), Color(red: 0.08, green: 0.33, blue: 0.66)],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
                     )
                     .frame(width: 78, height: 78)
-                    .shadow(color: Color(red: 0.06, green: 0.43, blue: 0.42).opacity(0.28), radius: 14, y: 8)
+                    .shadow(color: Color(red: 0.12, green: 0.43, blue: 0.83).opacity(0.3), radius: 14, y: 8)
                 Image(systemName: "rectangle.stack.badge.plus")
                     .font(.system(size: 32, weight: .semibold))
                     .foregroundStyle(.white)
@@ -146,38 +147,38 @@ struct ContentView: View {
             .buttonStyle(.bordered)
             .controlSize(.large)
             .disabled(isBusy)
+        }
+        .cardStyle()
+    }
 
-            VStack(alignment: .leading, spacing: 9) {
-                Label("Sottolineature da usare", systemImage: "highlighter")
-                    .font(.subheadline.weight(.semibold))
-                Picker("Sottolineature da usare", selection: $highlightMode) {
-                    ForEach(HighlightMergeMode.allCases, id: \.self) { mode in
-                        Text(mode.title).tag(mode)
-                    }
+    private var highlightCard: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Label("Sottolineature da mantenere", systemImage: "highlighter")
+                .font(.headline)
+
+            Text("Decidi quali evidenziazioni tenere nel file unito. Puoi usare entrambi i backup oppure solo uno dei due.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+
+            Picker("Sottolineature da mantenere", selection: $highlightMode) {
+                ForEach(HighlightMergeMode.allCases, id: \.self) { mode in
+                    Text(mode.title).tag(mode)
                 }
-                .pickerStyle(.segmented)
-                .disabled(isBusy)
+            }
+            .pickerStyle(.segmented)
+            .disabled(isBusy)
 
-                Text(highlightMode.explanation)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .padding(12)
-            .background(Color(.tertiarySystemGroupedBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 13, style: .continuous))
-            .onChange(of: highlightMode) {
-                analysis = nil
-                resolutions = [:]
-                mergeSummary = nil
-                mergeError = nil
-            }
+            Text(highlightMode.explanation)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
 
             Button(action: primaryAction) {
                 Label(primaryButtonTitle, systemImage: primaryButtonIcon)
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
+            .tint(Color(red: 0.12, green: 0.43, blue: 0.83))
             .controlSize(.large)
             .disabled(selectedURLs.count != 2 || isBusy || mergeSummary != nil)
 
@@ -201,6 +202,12 @@ struct ContentView: View {
             }
         }
         .cardStyle()
+        .onChange(of: highlightMode) {
+            analysis = nil
+            resolutions = [:]
+            mergeSummary = nil
+            mergeError = nil
+        }
     }
 
     private var primaryButtonTitle: String {
@@ -358,7 +365,7 @@ struct ContentView: View {
                     HStack(spacing: 11) {
                         Image(systemName: "doc.badge.gearshape")
                             .font(.title3)
-                            .foregroundStyle(Color(red: 0.06, green: 0.43, blue: 0.42))
+                            .foregroundStyle(Color(red: 0.12, green: 0.43, blue: 0.83))
                             .frame(width: 28)
                         VStack(alignment: .leading, spacing: 3) {
                             Text(item.displayName)

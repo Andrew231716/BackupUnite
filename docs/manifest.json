@@ -3,8 +3,8 @@
   "short_name": "Backup Unite",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#eef4f8",
-  "theme_color": "#0f6e6a",
+  "background_color": "#eef4fb",
+  "theme_color": "#1f6fd4",
   "lang": "it",
   "icons": [
     {

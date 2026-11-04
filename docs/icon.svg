@@ -1,35 +1,31 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Backup Unite">
   <defs>
     <linearGradient id="bg" x1="80" y1="36" x2="430" y2="470" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#1a6f74"/>
-      <stop offset="1" stop-color="#0d5c58"/>
+      <stop stop-color="#3b8aef"/>
+      <stop offset="1" stop-color="#1555a8"/>
     </linearGradient>
     <linearGradient id="cloud" x1="160" y1="90" x2="360" y2="210" gradientUnits="userSpaceOnUse">
       <stop stop-color="#ffffff"/>
-      <stop offset="1" stop-color="#e7f6f4"/>
+      <stop offset="1" stop-color="#e8f3ff"/>
     </linearGradient>
     <linearGradient id="doc" x1="120" y1="230" x2="260" y2="420" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#f7fcfb"/>
-      <stop offset="1" stop-color="#d5ebe8"/>
+      <stop stop-color="#f7fbff"/>
+      <stop offset="1" stop-color="#d7e8fb"/>
     </linearGradient>
   </defs>
   <rect width="512" height="512" rx="112" fill="url(#bg)"/>
-  <!-- cloud -->
   <path fill="url(#cloud)" d="M178 188c0-34 28-62 62-62 22 0 41 11 52 28 8-6 18-10 29-10 28 0 50 22 50 50 0 4 0 8-1 11 24 6 42 28 42 54 0 31-25 56-56 56H178c-31 0-56-25-56-56 0-28 20-51 48-56 1-5 2-10 2-15z"/>
-  <!-- left backup card -->
   <g transform="translate(118 248) rotate(-8 70 90)">
     <rect width="140" height="180" rx="22" fill="url(#doc)"/>
-    <rect x="28" y="42" width="84" height="12" rx="6" fill="#8fc9c4"/>
-    <rect x="28" y="72" width="68" height="12" rx="6" fill="#b7dbd7"/>
-    <rect x="28" y="102" width="76" height="12" rx="6" fill="#b7dbd7"/>
+    <rect x="28" y="42" width="84" height="12" rx="6" fill="#7eb3f0"/>
+    <rect x="28" y="72" width="68" height="12" rx="6" fill="#b5d4f5"/>
+    <rect x="28" y="102" width="76" height="12" rx="6" fill="#b5d4f5"/>
   </g>
-  <!-- right backup card -->
   <g transform="translate(254 248) rotate(8 70 90)">
     <rect width="140" height="180" rx="22" fill="url(#doc)"/>
-    <rect x="28" y="42" width="84" height="12" rx="6" fill="#8fc9c4"/>
-    <rect x="28" y="72" width="68" height="12" rx="6" fill="#b7dbd7"/>
-    <rect x="28" y="102" width="76" height="12" rx="6" fill="#b7dbd7"/>
+    <rect x="28" y="42" width="84" height="12" rx="6" fill="#7eb3f0"/>
+    <rect x="28" y="72" width="68" height="12" rx="6" fill="#b5d4f5"/>
+    <rect x="28" y="102" width="76" height="12" rx="6" fill="#b5d4f5"/>
   </g>
-  <!-- unite arrows -->
   <path fill="#ffffff" d="M214 318h36l-10-14 10-14h-36l10 14-10 14zm84 0l-10-14 10-14h-36l10 14-10 14h36z"/>
 </svg>

@@ -11,6 +11,12 @@ const HIGHLIGHT_COPY = {
   rightOnly: "Usa soltanto le sottolineature del secondo backup selezionato."
 };
 
+const HIGHLIGHT_OPTIONS = [
+  { mode: "both", kicker: "Consigliato", title: "Entrambi i backup", copy: HIGHLIGHT_COPY.both },
+  { mode: "leftOnly", kicker: "Solo 1°", title: "Primo backup", copy: HIGHLIGHT_COPY.leftOnly },
+  { mode: "rightOnly", kicker: "Solo 2°", title: "Secondo backup", copy: HIGHLIGHT_COPY.rightOnly }
+];
+
 const state = {
   files: [],
   highlightMode: "both",
@@ -188,6 +194,30 @@ function highlightTitle(mode) {
   return mode === "leftOnly" ? "1° backup" : mode === "rightOnly" ? "2° backup" : "Entrambi";
 }
 
+function highlightPanel() {
+  const options = HIGHLIGHT_OPTIONS.map(function (item) {
+    return (
+      '<button class="option' + (state.highlightMode === item.mode ? " active" : "") + '" data-action="highlight" data-mode="' + item.mode + '" ' + (state.busy ? "disabled" : "") + ">" +
+        '<span class="option-kicker">' + item.kicker + "</span>" +
+        '<span class="option-title">' + item.title + "</span>" +
+        '<span class="option-copy">' + item.copy + "</span>" +
+      "</button>"
+    );
+  }).join("");
+  return (
+    '<section class="panel emphasis" id="highlight-panel">' +
+      "<h2>Sottolineature da mantenere</h2>" +
+      '<p class="muted">Decidi quali evidenziazioni tenere nel file unito. Puoi usare entrambi i backup oppure solo uno dei due.</p>' +
+      '<div class="option-grid">' + options + "</div>" +
+      '<p class="caption">Scelta attuale: <strong>' + escapeHtml(highlightTitle(state.highlightMode)) + "</strong></p>" +
+      '<button class="primary full" style="margin-top:14px" data-action="primary" ' +
+        (state.files.length !== 2 || state.busy || state.summary ? "disabled" : "") + ">" + primaryLabel() + "</button>" +
+      (state.busy ? '<div class="busy" style="margin-top:12px"><div aria-hidden="true">⏳</div><div><strong>' + escapeHtml(state.status) + "</strong><div class=\"caption\">Non chiudere la pagina; il controllo finale può richiedere qualche minuto.</div></div></div>" : "") +
+      (state.error ? '<p class="error">' + escapeHtml(state.error) + "</p>" : "") +
+    "</section>"
+  );
+}
+
 function resolverSheet() {
   if (!state.resolverOpen || !state.analysis) return "";
   const conflicts = state.analysis.conflicts;
@@ -267,20 +297,8 @@ function render() {
           pickButtonLabel() +
         "</button>" +
         (state.files.length ? '<button class="secondary full" style="margin-top:8px" data-action="clear-files" ' + (state.busy ? "disabled" : "") + ">Rimuovi selezione</button>" : "") +
-        '<div class="context" style="margin-top:12px">' +
-          "<strong>Sottolineature da usare</strong>" +
-          '<div class="segmented" style="margin:10px 0">' +
-            '<button class="' + (state.highlightMode === "both" ? "active" : "") + '" data-action="highlight" data-mode="both" ' + (state.busy ? "disabled" : "") + ">Entrambi</button>" +
-            '<button class="' + (state.highlightMode === "leftOnly" ? "active" : "") + '" data-action="highlight" data-mode="leftOnly" ' + (state.busy ? "disabled" : "") + ">1° backup</button>" +
-            '<button class="' + (state.highlightMode === "rightOnly" ? "active" : "") + '" data-action="highlight" data-mode="rightOnly" ' + (state.busy ? "disabled" : "") + ">2° backup</button>" +
-          "</div>" +
-          '<p class="caption">' + HIGHLIGHT_COPY[state.highlightMode] + "</p>" +
-        "</div>" +
-        '<button class="primary full" style="margin-top:14px" data-action="primary" ' +
-          (state.files.length !== 2 || state.busy || state.summary ? "disabled" : "") + ">" + primaryLabel() + "</button>" +
-        (state.busy ? '<div class="busy"><div aria-hidden="true">⏳</div><div><strong>' + escapeHtml(state.status) + "</strong><div class=\"caption\">Non chiudere la pagina; il controllo finale può richiedere qualche minuto.</div></div></div>" : "") +
-        (state.error ? '<p class="error">' + escapeHtml(state.error) + "</p>" : "") +
       "</section>" +
+      highlightPanel() +
       conflictSummary() +
       resultCard() +
       savedCard() +
