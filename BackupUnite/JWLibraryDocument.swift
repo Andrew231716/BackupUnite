@@ -3,13 +3,13 @@ import UniformTypeIdentifiers
 
 extension UTType {
     static var jwLibraryBackup: UTType {
-        UTType(filenameExtension: "jwlibrary")
-            ?? UTType(exportedAs: "it.andreapozzi.jwlibrary-backup", conformingTo: .zip)
+        UTType(exportedAs: "it.andreapozzi.jwlibrary-backup")
     }
 }
 
 struct JWLibraryDocument: FileDocument {
     static var readableContentTypes: [UTType] { [.jwLibraryBackup] }
+    static var writableContentTypes: [UTType] { [.jwLibraryBackup] }
 
     var data: Data
 

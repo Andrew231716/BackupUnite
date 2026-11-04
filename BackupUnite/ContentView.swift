@@ -32,6 +32,7 @@ struct ContentView: View {
                 VStack(spacing: 18) {
                     header
                     mergeCard
+                    highlightCard
                     if let analysis, !analysis.conflicts.isEmpty { conflictSummaryCard(analysis) }
                     if let mergeSummary { resultCard(mergeSummary) }
                     savedBackupsCard
@@ -78,21 +79,31 @@ struct ContentView: View {
     }
 
     private var header: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 12) {
             ZStack {
-                Circle().fill(Color.blue.opacity(0.12)).frame(width: 82, height: 82)
-                Image(systemName: "arrow.triangle.2.circlepath.icloud.fill")
-                    .font(.system(size: 42))
-                    .foregroundStyle(.blue)
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [Color(red: 0.23, green: 0.54, blue: 0.94), Color(red: 0.08, green: 0.33, blue: 0.66)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 78, height: 78)
+                    .shadow(color: Color(red: 0.12, green: 0.43, blue: 0.83).opacity(0.3), radius: 14, y: 8)
+                Image(systemName: "rectangle.stack.badge.plus")
+                    .font(.system(size: 32, weight: .semibold))
+                    .foregroundStyle(.white)
             }
-            Text("Unisci i tuoi backup")
-                .font(.title2.bold())
-            Text("Carica anche i backup futuri, modifica le scelte e crea un file pronto per JW Library.")
+            Text("Backup Unite")
+                .font(.largeTitle.weight(.bold))
+            Text("Unisci due backup .jwlibrary, scegli cosa conservare e salva un file pronto per JW Library.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
+        .padding(.vertical, 8)
         .padding(.bottom, 2)
     }
 
@@ -136,38 +147,38 @@ struct ContentView: View {
             .buttonStyle(.bordered)
             .controlSize(.large)
             .disabled(isBusy)
+        }
+        .cardStyle()
+    }
 
-            VStack(alignment: .leading, spacing: 9) {
-                Label("Sottolineature da usare", systemImage: "highlighter")
-                    .font(.subheadline.weight(.semibold))
-                Picker("Sottolineature da usare", selection: $highlightMode) {
-                    ForEach(HighlightMergeMode.allCases, id: \.self) { mode in
-                        Text(mode.title).tag(mode)
-                    }
+    private var highlightCard: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Label("Sottolineature da mantenere", systemImage: "highlighter")
+                .font(.headline)
+
+            Text("Decidi quali evidenziazioni tenere nel file unito. Puoi usare entrambi i backup oppure solo uno dei due.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+
+            Picker("Sottolineature da mantenere", selection: $highlightMode) {
+                ForEach(HighlightMergeMode.allCases, id: \.self) { mode in
+                    Text(mode.title).tag(mode)
                 }
-                .pickerStyle(.segmented)
-                .disabled(isBusy)
+            }
+            .pickerStyle(.segmented)
+            .disabled(isBusy)
 
-                Text(highlightMode.explanation)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .padding(12)
-            .background(Color(.tertiarySystemGroupedBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 13, style: .continuous))
-            .onChange(of: highlightMode) {
-                analysis = nil
-                resolutions = [:]
-                mergeSummary = nil
-                mergeError = nil
-            }
+            Text(highlightMode.explanation)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
 
             Button(action: primaryAction) {
                 Label(primaryButtonTitle, systemImage: primaryButtonIcon)
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
+            .tint(Color(red: 0.12, green: 0.43, blue: 0.83))
             .controlSize(.large)
             .disabled(selectedURLs.count != 2 || isBusy || mergeSummary != nil)
 
@@ -191,6 +202,12 @@ struct ContentView: View {
             }
         }
         .cardStyle()
+        .onChange(of: highlightMode) {
+            analysis = nil
+            resolutions = [:]
+            mergeSummary = nil
+            mergeError = nil
+        }
     }
 
     private var primaryButtonTitle: String {
@@ -346,9 +363,9 @@ struct ContentView: View {
             } else {
                 ForEach(Array(savedBackups.prefix(8))) { item in
                     HStack(spacing: 11) {
-                        Image(systemName: "doc.zipper")
+                        Image(systemName: "doc.badge.gearshape")
                             .font(.title3)
-                            .foregroundStyle(.purple)
+                            .foregroundStyle(Color(red: 0.12, green: 0.43, blue: 0.83))
                             .frame(width: 28)
                         VStack(alignment: .leading, spacing: 3) {
                             Text(item.displayName)
@@ -588,12 +605,27 @@ struct ContentView: View {
     private func prepareExport(_ url: URL) {
         do {
             exportDocument = try JWLibraryDocument(url: url)
-            exportFilename = url.lastPathComponent
+            exportFilename = Self.jwLibraryFilename(from: url.lastPathComponent)
             isExporterPresented = true
             storageMessage = nil
         } catch {
             mergeError = "Impossibile preparare il download: \(error.localizedDescription)"
         }
+    }
+
+    private static func jwLibraryFilename(from name: String) -> String {
+        var base = name
+        if base.lowercased().hasSuffix(".zip") {
+            base = String(base.dropLast(4))
+        }
+        if base.lowercased().hasSuffix(".jwlibrary") {
+            base = String(base.dropLast(".jwlibrary".count))
+        }
+        let cleaned = base
+            .replacingOccurrences(of: "/", with: "-")
+            .replacingOccurrences(of: ":", with: "-")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        return (cleaned.isEmpty ? "Backup-Unito" : cleaned) + ".jwlibrary"
     }
 
     private func exportCompleted(_ result: Result<URL, Error>) {

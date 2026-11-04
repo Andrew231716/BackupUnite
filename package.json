@@ -1,0 +1,10 @@
+{
+  "name": "backupunite",
+  "private": true,
+  "version": "1.4.0",
+  "description": "Unisci due backup JW Library schema 16 nel browser",
+  "scripts": {
+    "start": "python3 -m http.server 8080 --directory docs",
+    "deploy": "vercel --prod --yes"
+  }
+}

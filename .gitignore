@@ -5,3 +5,4 @@ DerivedData/
 .vscode/
 .idea/
 Resources/*.jwlibrary
+.vercel

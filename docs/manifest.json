@@ -3,14 +3,27 @@
   "short_name": "Backup Unite",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#140e1a",
-  "theme_color": "#140e1a",
+  "background_color": "#eef4fb",
+  "theme_color": "#1f6fd4",
   "lang": "it",
   "icons": [
     {
       "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
       "sizes": "512x512",
-      "type": "image/svg+xml"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
