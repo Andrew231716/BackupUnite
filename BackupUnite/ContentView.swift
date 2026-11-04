@@ -78,21 +78,31 @@ struct ContentView: View {
     }
 
     private var header: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 12) {
             ZStack {
-                Circle().fill(Color.blue.opacity(0.12)).frame(width: 82, height: 82)
-                Image(systemName: "arrow.triangle.2.circlepath.icloud.fill")
-                    .font(.system(size: 42))
-                    .foregroundStyle(.blue)
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [Color(red: 0.07, green: 0.31, blue: 0.36), Color(red: 0.06, green: 0.43, blue: 0.42)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 78, height: 78)
+                    .shadow(color: Color(red: 0.06, green: 0.43, blue: 0.42).opacity(0.28), radius: 14, y: 8)
+                Image(systemName: "rectangle.stack.badge.plus")
+                    .font(.system(size: 32, weight: .semibold))
+                    .foregroundStyle(.white)
             }
-            Text("Unisci i tuoi backup")
-                .font(.title2.bold())
-            Text("Carica anche i backup futuri, modifica le scelte e crea un file pronto per JW Library.")
+            Text("Backup Unite")
+                .font(.largeTitle.weight(.bold))
+            Text("Unisci due backup .jwlibrary, scegli cosa conservare e salva un file pronto per JW Library.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
+        .padding(.vertical, 8)
         .padding(.bottom, 2)
     }
 
@@ -346,9 +356,9 @@ struct ContentView: View {
             } else {
                 ForEach(Array(savedBackups.prefix(8))) { item in
                     HStack(spacing: 11) {
-                        Image(systemName: "doc.zipper")
+                        Image(systemName: "doc.badge.gearshape")
                             .font(.title3)
-                            .foregroundStyle(.purple)
+                            .foregroundStyle(Color(red: 0.06, green: 0.43, blue: 0.42))
                             .frame(width: 28)
                         VStack(alignment: .leading, spacing: 3) {
                             Text(item.displayName)
@@ -588,12 +598,27 @@ struct ContentView: View {
     private func prepareExport(_ url: URL) {
         do {
             exportDocument = try JWLibraryDocument(url: url)
-            exportFilename = url.lastPathComponent
+            exportFilename = Self.jwLibraryFilename(from: url.lastPathComponent)
             isExporterPresented = true
             storageMessage = nil
         } catch {
             mergeError = "Impossibile preparare il download: \(error.localizedDescription)"
         }
+    }
+
+    private static func jwLibraryFilename(from name: String) -> String {
+        var base = name
+        if base.lowercased().hasSuffix(".zip") {
+            base = String(base.dropLast(4))
+        }
+        if base.lowercased().hasSuffix(".jwlibrary") {
+            base = String(base.dropLast(".jwlibrary".count))
+        }
+        let cleaned = base
+            .replacingOccurrences(of: "/", with: "-")
+            .replacingOccurrences(of: ":", with: "-")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        return (cleaned.isEmpty ? "Backup-Unito" : cleaned) + ".jwlibrary"
     }
 
     private func exportCompleted(_ result: Result<URL, Error>) {

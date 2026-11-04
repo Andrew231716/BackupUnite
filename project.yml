@@ -12,8 +12,8 @@ settings:
     DEVELOPMENT_TEAM: VUJ5NU7V4F
     CODE_SIGN_STYLE: Automatic
     SWIFT_VERSION: "6.0"
-    CURRENT_PROJECT_VERSION: 6
-    MARKETING_VERSION: 1.3.0
+    CURRENT_PROJECT_VERSION: 7
+    MARKETING_VERSION: 1.4.0
 targets:
   BackupUnite:
     type: application
@@ -29,6 +29,28 @@ targets:
         UIFileSharingEnabled: true
         UIApplicationSupportsIndirectInputEvents: true
         UILaunchScreen: {}
+        UTExportedTypeDeclarations:
+          - UTTypeIdentifier: it.andreapozzi.jwlibrary-backup
+            UTTypeDescription: JW Library Backup
+            UTTypeConformsTo:
+              - public.data
+              - public.archive
+            UTTypeTagSpecification:
+              public.filename-extension:
+                - jwlibrary
+              public.mime-type:
+                - application/octet-stream
+        UTImportedTypeDeclarations:
+          - UTTypeIdentifier: it.andreapozzi.jwlibrary-backup
+            UTTypeDescription: JW Library Backup
+            UTTypeConformsTo:
+              - public.data
+              - public.archive
+            UTTypeTagSpecification:
+              public.filename-extension:
+                - jwlibrary
+              public.mime-type:
+                - application/octet-stream
     sources:
       - BackupUnite
       - path: Resources

@@ -136,9 +136,13 @@ enum BackupStorage {
     }
 
     private static func cleanedBaseName(_ value: String) -> String {
-        let withoutExtension = value.lowercased().hasSuffix(".jwlibrary")
-            ? String(value.dropLast(".jwlibrary".count))
-            : value
+        var withoutExtension = value
+        if withoutExtension.lowercased().hasSuffix(".zip") {
+            withoutExtension = String(withoutExtension.dropLast(4))
+        }
+        if withoutExtension.lowercased().hasSuffix(".jwlibrary") {
+            withoutExtension = String(withoutExtension.dropLast(".jwlibrary".count))
+        }
         let forbidden = CharacterSet(charactersIn: "/\\:\0")
         return withoutExtension
             .components(separatedBy: forbidden)

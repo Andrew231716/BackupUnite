@@ -1,5 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="112" fill="#2a1838"/>
-  <path fill="#8b6cf0" d="M118 168h110c18 0 32 14 32 32v152c0 18-14 32-32 32H118c-18 0-32-14-32-32V200c0-18 14-32 32-32zm166 0h110c18 0 32 14 32 32v152c0 18-14 32-32 32H284c-18 0-32-14-32-32V200c0-18 14-32 32-32z"/>
-  <path fill="#c4b0ff" d="M196 248h120c8 0 14 8 11 15l-24 58c-2 6-8 10-14 10H223c-6 0-12-4-14-10l-24-58c-3-7 3-15 11-15z"/>
+  <defs>
+    <linearGradient id="bg" x1="80" y1="40" x2="440" y2="480" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#124f5d"/>
+      <stop offset="1" stop-color="#0f6e6a"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <path fill="#e8f5f3" d="M118 176h112c16 0 28 12 28 28v144c0 16-12 28-28 28H118c-16 0-28-12-28-28V204c0-16 12-28 28-28zm164 0h112c16 0 28 12 28 28v144c0 16-12 28-28 28H282c-16 0-28-12-28-28V204c0-16 12-28 28-28z"/>
+  <path fill="#7ec8c2" d="M196 250h120c8 0 14 8 11 15l-22 54c-2 6-8 10-14 10H221c-6 0-12-4-14-10l-22-54c-3-7 3-15 11-15z"/>
 </svg>

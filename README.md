@@ -21,7 +21,7 @@ Apri `docs/index.html` da un server locale (non da `file://`, perché il motore 
 python3 -m http.server 8080 --directory docs
 ```
 
-Poi vai su [http://localhost:8080](http://localhost:8080). Scegli due file `.jwlibrary`, tocca **Analizza conflitti**, decidi cosa conservare e scarica il backup verificato.
+Poi vai su [http://localhost:8080](http://localhost:8080). Scegli due file `.jwlibrary`, tocca **Analizza conflitti**, decidi cosa conservare e scarica il backup verificato come file `.jwlibrary` (non `.zip`).
 
 La pubblicazione su GitHub Pages usa la cartella `docs/` e il workflow in `.github/workflows/pages.yml`.
 

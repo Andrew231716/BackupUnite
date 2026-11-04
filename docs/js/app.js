@@ -112,7 +112,7 @@ function conflictSummary() {
     return '<div class="row space"><span>' + KIND_META[kind].title + '</span><strong>' + grouped[kind] + '</strong></div>';
   }).join("");
   return (
-    '<section class="card">' +
+    '<section class="panel">' +
       '<h2>Collisioni trovate <span>' + state.analysis.conflicts.length + '</span></h2>' +
       rows +
       '<p class="' + (unresolved ? "error" : "ok-line") + '">' +
@@ -128,8 +128,9 @@ function resultCard() {
   if (!summary) return "";
   const resolved = summary.bookmarkConflicts + summary.markingConflicts + summary.noteConflicts + summary.inputFieldConflicts;
   return (
-    '<section class="card">' +
-      '<h2 class="ok-line">Backup verificato <span class="caption">schema 16</span></h2>' +
+    '<section class="panel">' +
+      '<h2>Backup verificato <span>schema 16</span></h2>' +
+      '<p class="ok-line">Pronto per il ripristino in JW Library</p>' +
       '<div class="grid">' +
         stat("Note", summary.notes) +
         stat("Evidenziazioni", summary.highlights) +
@@ -144,10 +145,10 @@ function resultCard() {
         summary.bookmarkConflicts + " segnalibri, " + summary.markingConflicts + " evidenziazioni, " +
         summary.noteConflicts + " note e " + summary.inputFieldConflicts + " campi.</p>" : "") +
       '<div class="stack" style="margin-top:12px">' +
-        '<button class="success full" data-action="download-result">Scarica il backup unito</button>' +
+        '<button class="success full" data-action="download-result">Scarica .jwlibrary</button>' +
         (state.analysis && state.analysis.conflicts.length ? '<button class="secondary full" data-action="open-resolver">Modifica le scelte e ricrea</button>' : "") +
         '<button class="secondary full" data-action="reset">Unisci altri due backup</button>' +
-        '<div class="mono">' + escapeHtml(summary.filename) + "</div>" +
+        '<div class="mono">' + escapeHtml(ensureJwLibraryName(summary.filename)) + "</div>" +
       "</div>" +
     "</section>"
   );
@@ -166,7 +167,7 @@ function savedCard() {
             formatDate(item.modified) + " · " + BackupUniteStorage.formatSize(item.size) +
           "</div></div>" +
           '<div class="row">' +
-            '<button class="secondary" data-action="download-saved" data-id="' + item.id + '">Scarica</button>' +
+            '<button class="secondary" data-action="download-saved" data-id="' + item.id + '">.jwlibrary</button>' +
             '<button class="secondary" data-action="rename-saved" data-id="' + item.id + '">Rinomina</button>' +
           "</div>" +
         "</div>" +
@@ -174,9 +175,9 @@ function savedCard() {
     );
   }).join("");
   return (
-    '<section class="card">' +
+    '<section class="panel">' +
       "<h2>I tuoi backup uniti <span>" + state.saved.length + "</span></h2>" +
-      '<p class="muted">Restano in questo browser. Puoi scaricarli e aprirli in JW Library.</p>' +
+      '<p class="muted">Restano in questo browser. Si scaricano come file .jwlibrary, pronti per JW Library.</p>' +
       (items || '<div class="file-box">Non hai ancora creato backup</div>') +
       (state.storageMessage ? '<p class="ok-line">' + escapeHtml(state.storageMessage) + "</p>" : "") +
     "</section>"
@@ -246,15 +247,27 @@ function bulkMenu(conflict) {
   );
 }
 
+function brandMark() {
+  return (
+    '<div class="brand-mark" aria-hidden="true">' +
+      '<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+        '<rect x="6" y="12" width="14" height="24" rx="3" fill="currentColor" opacity="0.88"/>' +
+        '<rect x="28" y="12" width="14" height="24" rx="3" fill="currentColor" opacity="0.88"/>' +
+        '<path d="M16 22h16c1.2 0 2 1.1 1.6 2.2l-3.2 8.1A2 2 0 0 1 28.5 34h-9a2 2 0 0 1-1.9-1.7l-3.2-8.1C13.9 23.1 14.8 22 16 22Z" fill="#9fd8d3"/>' +
+      "</svg>" +
+    "</div>"
+  );
+}
+
 function render() {
   $("app").innerHTML =
     '<header class="hero">' +
-      '<div class="logo">☁︎</div>' +
-      "<h1>Unisci i tuoi backup</h1>" +
-      "<p>Carica due file .jwlibrary, scegli cosa conservare in caso di collisioni e crea un backup verificato per JW Library.</p>" +
+      brandMark() +
+      '<h1 class="brand">Backup Unite</h1>' +
+      '<p class="lede">Unisci due backup .jwlibrary, scegli cosa conservare e scarica un file pronto per JW Library.</p>' +
     "</header>" +
     '<div class="stack">' +
-      '<section class="card">' +
+      '<section class="panel">' +
         "<h2>Nuovo merge</h2>" +
         '<p class="muted">Scegli due file .jwlibrary. Su iPhone, se i file sembrano non selezionabili, apri «Sfoglia» e sceglili uno alla volta: il filtro del sistema non riconosce sempre l’estensione.</p>' +
         selectedNames() +
@@ -273,7 +286,7 @@ function render() {
         "</div>" +
         '<button class="primary full" style="margin-top:14px" data-action="primary" ' +
           (state.files.length !== 2 || state.busy || state.summary ? "disabled" : "") + ">" + primaryLabel() + "</button>" +
-        (state.busy ? '<div class="busy"><div>⏳</div><div><strong>' + escapeHtml(state.status) + "</strong><div class=\"caption\">Non chiudere la pagina; il controllo finale può richiedere qualche minuto.</div></div></div>" : "") +
+        (state.busy ? '<div class="busy"><div aria-hidden="true">⏳</div><div><strong>' + escapeHtml(state.status) + "</strong><div class=\"caption\">Non chiudere la pagina; il controllo finale può richiedere qualche minuto.</div></div></div>" : "") +
         (state.error ? '<p class="error">' + escapeHtml(state.error) + "</p>" : "") +
       "</section>" +
       conflictSummary() +
@@ -385,16 +398,17 @@ async function startFinalMerge() {
     });
     const summary = result.summary;
     const bytes = summary.bytes instanceof Uint8Array ? summary.bytes : new Uint8Array(summary.bytes);
+    const filename = ensureJwLibraryName(summary.filename);
     const record = {
       id: crypto.randomUUID(),
-      name: summary.filename,
+      name: filename,
       modified: Date.now(),
       size: bytes.byteLength,
       bytes: bytes
     };
     await BackupUniteStorage.save(record);
     await refreshSaved();
-    state.summary = Object.assign({}, summary, { id: record.id, bytes: bytes });
+    state.summary = Object.assign({}, summary, { id: record.id, bytes: bytes, filename: filename });
     state.storageMessage = "Backup conservato nell’archivio del browser.";
     state.busy = false;
     render();
@@ -405,12 +419,55 @@ async function startFinalMerge() {
   }
 }
 
-function downloadBytes(name, bytes) {
-  const blob = new Blob([bytes], { type: "application/zip" });
+function ensureJwLibraryName(name) {
+  const cleaned = String(name || "Backup-Unito")
+    .replace(/\.zip$/i, "")
+    .replace(/\.jwlibrary$/i, "")
+    .replace(/[/\\:\0]/g, "-")
+    .trim();
+  return (cleaned || "Backup-Unito") + ".jwlibrary";
+}
+
+async function downloadBytes(name, bytes) {
+  const filename = ensureJwLibraryName(name);
+  const payload = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  const file = new File([payload], filename, { type: "application/octet-stream" });
+
+  // On mobile, the share sheet keeps the .jwlibrary name better than a raw download.
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file], title: filename });
+      return;
+    } catch (error) {
+      if (error && error.name === "AbortError") return;
+    }
+  }
+
+  if (window.showSaveFilePicker) {
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: filename,
+        types: [{
+          description: "JW Library Backup",
+          accept: { "application/octet-stream": [".jwlibrary"] }
+        }]
+      });
+      const writable = await handle.createWritable();
+      await writable.write(payload);
+      await writable.close();
+      return;
+    } catch (error) {
+      if (error && error.name === "AbortError") return;
+    }
+  }
+
+  // Avoid application/zip: many browsers rename the file to .zip.
+  const blob = new Blob([payload], { type: "application/octet-stream" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
+  link.download = filename;
   link.href = url;
-  link.download = name;
+  link.rel = "noopener";
   document.body.appendChild(link);
   link.click();
   link.remove();
@@ -484,7 +541,12 @@ document.addEventListener("click", async function (event) {
     state.resolverIndex = next >= 0 ? next : first;
     render();
   }
-  if (action === "download-result" && state.summary) downloadBytes(state.summary.filename, state.summary.bytes);
+  if (action === "download-result" && state.summary) {
+    downloadBytes(state.summary.filename, state.summary.bytes).catch(function (error) {
+      state.error = error.message || "Download non riuscito.";
+      render();
+    });
+  }
   if (action === "reset") {
     state.files = [];
     state.analysis = null;
@@ -498,20 +560,25 @@ document.addEventListener("click", async function (event) {
   }
   if (action === "download-saved") {
     const item = state.saved.find(function (entry) { return entry.id === button.getAttribute("data-id"); });
-    if (item) downloadBytes(item.name, item.bytes);
+    if (item) {
+      downloadBytes(item.name, item.bytes).catch(function (error) {
+        state.error = error.message || "Download non riuscito.";
+        render();
+      });
+    }
   }
   if (action === "rename-saved") {
     const item = state.saved.find(function (entry) { return entry.id === button.getAttribute("data-id"); });
     if (!item) return;
-    const next = prompt("Nome del backup", item.name.replace(/\.jwlibrary$/i, ""));
+    const next = prompt("Nome del backup", item.name.replace(/\.jwlibrary$/i, "").replace(/\.zip$/i, ""));
     if (!next) return;
-    const cleaned = next.replace(/\.jwlibrary$/i, "").replace(/[/\\:\0]/g, "-").trim();
+    const cleaned = next.replace(/\.jwlibrary$/i, "").replace(/\.zip$/i, "").replace(/[/\\:\0]/g, "-").trim();
     if (!cleaned) {
       state.error = "Inserisci un nome valido per il backup.";
       render();
       return;
     }
-    item.name = cleaned + ".jwlibrary";
+    item.name = ensureJwLibraryName(cleaned);
     await BackupUniteStorage.save(item);
     if (state.summary && state.summary.id === item.id) state.summary.filename = item.name;
     state.storageMessage = "Backup rinominato.";
